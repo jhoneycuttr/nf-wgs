@@ -82,13 +82,13 @@ process multiqc {
 
     script:
     """
-	#!/usr/bin/env bash
- 	
-	multiqc .
+    #!/usr/bin/env bash
+    
+    multiqc .
+    
     """
 }
 
-/*
 // bwa alignment
 process bwa_align {
 	tag "align ${pair_id}"
@@ -115,9 +115,9 @@ process bwa_align {
 	#!/usr/bin/env bash
 
 	# alignment
-	bwa mem -t 10 -M -R "@RG\tID:"${pair_id}"\tLB:"${pair_id}"\tPL:illumina\tSM:"${pair_id}"\tPU:"${pair_id}""
-	${ref} ${reads} | \
+	bwa mem -t 8 $ref ${reads} | \
 		samtools view -b -o temp.bam
+		
 
 	# sorting reads
 	samtools sort -@ 8 -o ${pair_id}.bam temp.bam
@@ -129,7 +129,7 @@ process bwa_align {
 	rm temp.bam
 	"""
 }
-*/
+
 
 workflow.onComplete { 
 	println ( workflow.success ? "\nDone! Open the following report in your browser --> $params.outdir/multiqc_report.html\n" : "Oops .. something went wrong" )
