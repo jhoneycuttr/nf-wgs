@@ -413,13 +413,25 @@ process pf_hs_ratio_calc {
 	"""
 }
 
-/*
-// Rmd report generation
+
+// Rmd run quality report generation
 process run_report {
  
+	tag "Run quality report"
 
+	publishDir params.outdir, mode:'copy'
+
+	output:
+	file('run_quality_report.html')
+
+	script:
+	"""
+	#!/usr/bin/env bash
+
+	Rscript -e "rmarkdown::render('run_quality_report.Rmd')"
+	"""
 }
-*/
+
 
 workflow.onComplete { 
 	println ( workflow.success ? "\nDone! Open the these reports in your browser --> \nmultiqc = $params.outdir/multiqc_report.html\nrun quality report = $params.outdir/reportrmd.html\nnextflow summary = $params.outdir/report.html": "Oops .. something went wrong" )
