@@ -422,8 +422,8 @@ process run_report {
 	publishDir params.outdir, mode:'copy'
 
 	input:
-	pf_summary_ch.collect()
-	hs_summary_ch.collect()
+	file('Bam_stat_summary_pf_final.tsv') from pf_summary_ch.collect()
+	file('Bam_stat_summary_hs_final.tsv') from hs_summary_ch.collect()
 
 	output:
 	file('run_quality_report.html')
