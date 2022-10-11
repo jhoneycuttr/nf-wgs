@@ -421,6 +421,10 @@ process run_report {
 
 	publishDir params.outdir, mode:'copy'
 
+	input:
+	pf_summary_ch.collect()
+	hs_summary_ch.collect()
+
 	output:
 	file('run_quality_report.html')
 
