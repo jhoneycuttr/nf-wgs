@@ -113,10 +113,10 @@ process bwa_align {
 	file("${pair_id}.bam")
 	file("${pair_id}.clean.bam")
 
-	time '1h'
+	time '2h'
 	cpus 8
 	penv 'smp' 
-	memory '16 GB'
+	memory '48 GB'
 
 	script:
 
