@@ -145,6 +145,7 @@ process sam_sort {
 	file("${pair_id}.sorted.bam")
 	file("${pair_id}.bam")
 	file("${pair_id}.clean.bam")
+	file("${pair_id}_dup_metrics.txt")
 
 	time '4h'
 	cpus 8
@@ -162,7 +163,7 @@ process sam_sort {
 	gatk --java-options "-Xmx40g -Xms40g" SamFormatConverter -R $ref -I ${pair_id}.sam -O ${pair_id}.bam
     gatk --java-options "-Xmx40g -Xms40g" CleanSam -R $ref -I ${pair_id}.bam -O ${pair_id}.clean.bam
     gatk --java-options "-Xmx40g -Xms40g" SortSam -R $ref -I ${pair_id}.clean.bam -O ${pair_id}.sorted.bam -SO coordinate --CREATE_INDEX true
-    gatk --java-options "-Xmx40g -Xms40g" MarkDuplicatesSpark -R $ref -I ${pair_id}.sorted.bam -O ${pair_id}.sorted.dup.bam
+    gatk --java-options "-Xmx40g -Xms40g" MarkDuplicates -R $ref -I ${pair_id}.sorted.bam -O ${pair_id}.sorted.dup.bam -M ${pair_id}_dup_metrics.txt
 
     # remove intermediary bams
     # rm ${pair_id}.sam ${pair_id}.bam ${pair_id}.clean.bam
