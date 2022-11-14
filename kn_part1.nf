@@ -106,17 +106,12 @@ process bwa_align {
 	set pair_id, file(reads) from trimmed_reads2_ch
 
 	output:
-	set pair_id, file("${pair_id}.sorted.dup.bam") into bam_ch
-	//file("${pair_id}.sorted.bam.bai")
-	file("${pair_id}.sam")
-	file("${pair_id}.sorted.bam")
-	file("${pair_id}.bam")
-	file("${pair_id}.clean.bam")
-
-	time '2h'
+	set pair_id, file("${pair_id}.sam") into sam_ch
+	
+	time '4h'
 	cpus 8
 	penv 'smp' 
-	memory '48 GB'
+	memory '64 GB'
 
 	script:
 
@@ -124,10 +119,44 @@ process bwa_align {
 	#!/usr/bin/env bash
 
 	# load modules
-	module load CBI bwa gatk/4.2.2.0
+	module load CBI bwa
 
 	# alignment and populate read group header
-	bwa mem -t 8 -M -R "@RG\\tID:${pair_id}\\tLB:${pair_id}\\tPL:illumina\\tSM:${pair_id}\\tPU:${pair_id}" $ref ${reads} > ${pair_id}.sam
+	bwa mem -t 12 -M -R "@RG\\tID:${pair_id}\\tLB:${pair_id}\\tPL:illumina\\tSM:${pair_id}\\tPU:${pair_id}" $ref ${reads} > ${pair_id}.sam
+
+	
+	"""
+}
+
+// sam file sorting
+process sam_sort {
+	
+	tag "sam sorting ${pair_id}"
+
+	publishDir "${params.outdir}/$pair_id"
+
+	input:
+	set pair_id, file(sam) from sam_ch
+
+	output:
+	set pair_id, file("${pair_id}.sorted.dup.bam") into bam_ch
+	//file("${pair_id}.sorted.bam.bai")
+	//file("${pair_id}.sam")
+	file("${pair_id}.sorted.bam")
+	file("${pair_id}.bam")
+	file("${pair_id}.clean.bam")
+
+	time '4h'
+	cpus 8
+	penv 'smp' 
+	memory '64 GB'
+
+
+	"""
+	#!/usr/bin/env bash
+
+	# load modules
+	module load CBI gatk/4.2.2.0
 
 	# sam file sorting
 	gatk --java-options "-Xmx40g -Xms40g" SamFormatConverter -R $ref -I ${pair_id}.sam -O ${pair_id}.bam
@@ -137,9 +166,8 @@ process bwa_align {
 
     # remove intermediary bams
     # rm ${pair_id}.sam ${pair_id}.bam ${pair_id}.clean.bam
-	"""
+    """
 }
-
 
 // samtools sorting Pf and human reads
 process sort_pf_human {
